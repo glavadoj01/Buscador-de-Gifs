@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { GifListComponent } from '@gifs/components/gif-list/gif-list.component';
+import { GifService } from '@gifs/services/gifs.service';
 
 
 // De forma temporal: A largo plazo => Peticion API externa
-const coleccionBase: string[] = [
+/* const coleccionBase: string[] = [
     "https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg",
     "https://flowbite.s3.amazonaws.com/docs/gallery/square/image-1.jpg",
     "https://flowbite.s3.amazonaws.com/docs/gallery/square/image-2.jpg",
@@ -16,7 +17,7 @@ const coleccionBase: string[] = [
     "https://flowbite.s3.amazonaws.com/docs/gallery/square/image-9.jpg",
     "https://flowbite.s3.amazonaws.com/docs/gallery/square/image-10.jpg",
     "https://flowbite.s3.amazonaws.com/docs/gallery/square/image-11.jpg"
-];
+]; */
 
 
 @Component({
@@ -25,5 +26,8 @@ const coleccionBase: string[] = [
   templateUrl: './trending-page.component.html',
 })
 export default class TrendingPageComponent {
-  imageUrls = coleccionBase;
+//  imageUrls = signal(coleccionBase);
+
+  gifService = inject( GifService );
+
 }
