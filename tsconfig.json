@@ -3,6 +3,16 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@environments/*": [
+        "src/environments/*"
+      ],
+      "@gifs/*": [
+        "src/app/gifs/*"
+      ]
+    },
+
     "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,
