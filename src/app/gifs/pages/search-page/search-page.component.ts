@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { GifListComponent } from '@gifs/components/gif-list/gif-list.component';
+import { Gif } from '@gifs/interfaces/Gif.interface';
 import { GifService } from '@gifs/services/gifs.service';
 
 @Component({
@@ -8,10 +9,18 @@ import { GifService } from '@gifs/services/gifs.service';
   templateUrl: './search-page.component.html',
 })
 export default class SearchPageComponent {
-  searchGifs( query: string ) {
-    console.log({query});
-  }
-
   gifService = inject( GifService );
+  gifs = signal<Gif[]>([]);
+
+  searchGifs( query: string ) {
+    this.gifService.loadSearchGifs( query ).subscribe({
+      next: ( response ) => {
+        this.gifs.set(response);
+      },
+      error: ( error ) => {
+        console.error('Error fetching search GIFs:', error);
+      }
+    });
+  }
 
 }
