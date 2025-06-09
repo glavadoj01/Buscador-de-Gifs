@@ -15,6 +15,14 @@
   </a>
   }
 
+    <div class="text-1xl text-center">
+      <br>
+      <hr>
+        <h3>Historial de busquedas:</h3>
+      <hr>
+      <br>
+    </div>
+
   @for (itemH of gifService.searchHistoryKeys(); track itemH) {
   <a
     [routerLink]="['/dashboard/history', itemH]"

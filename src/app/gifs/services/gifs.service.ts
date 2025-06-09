@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 
 // @3ª Party
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
 // @Local
@@ -26,7 +26,16 @@ export class GifService {
   private http = inject(HttpClient);
 
   trendingGifs = signal<Gif[]>([])
-  trendingGifsLoading = signal<boolean>(true);
+  trendingGifsIsLoading = signal<boolean>(false);
+  private trendingPage = signal<number>(0);
+
+  trendingGifGroup = computed<Gif[][]>( () => {
+    const group = [];
+    for (let i = 0; i < this.trendingGifs().length; i += 3) {
+      group.push(this.trendingGifs().slice(i, i + 3));
+    }
+    return group
+  })
 
   searchHistory = signal<Record<string, Gif[]>> (loadFromLocalStorage());
   searchHistoryKeys= computed(() => Object.keys(this.searchHistory()));
@@ -42,19 +51,27 @@ export class GifService {
   })
 
   loadTrendingGifs() {
+    // Evitar que se haga una peticion si ya se esta cargando
+    if (this.trendingGifsIsLoading()) return;
+    this.trendingGifsIsLoading.set(true);
+
     this.http.get<GiphyResponse>(`${environment.giphyUrl}/trending`, {
       params: {
         api_key: environment.giphyApiKey,
-        limit: '20',
-        rating: 'g'
+        limit: 24,
+        rating: 'g',
+        offset: this.trendingPage() * 20,
       }
     }).subscribe({
-      next: (respuesta) => {
+      next: respuesta => {
         const gifs = GifMapper.mapGiphyResponseToGifsArray(respuesta.data);
-        this.trendingGifs.set(gifs);
-        this.trendingGifsLoading.set(false);
+        this.trendingGifs.update( currentGifs =>
+          [...currentGifs, ...gifs]
+        );
+        this.trendingGifsIsLoading.set(false);
+        this.trendingPage.update( currentPage => currentPage + 1 );
       },
-      error: (error) => {
+      error: error => {
         console.error('Error fetching trending GIFs:', error);
       }
     })
@@ -66,8 +83,8 @@ export class GifService {
       params:{
         api_key: environment.giphyApiKey,
         q: query,
-        limit: '20',
-        offset: '0',
+        limit: 24,
+        offset: 0,
         rating: 'g',
         lang: 'es',
         bundle: 'messaging_non_clips'

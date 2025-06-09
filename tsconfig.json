@@ -10,7 +10,10 @@
       ],
       "@gifs/*": [
         "src/app/gifs/*"
-      ]
+      ],
+      "@shared/*": [
+        "src/app/shared/*"
+      ],
     },
 
     "outDir": "./dist/out-tsc",
